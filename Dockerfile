@@ -1,5 +1,5 @@
-# Backend placeholder image
+# Example dummy Dockerfile
 FROM python:3.13
 
-# Just a dummy command
-CMD ["echo", "✅ Backend container built successfully — no code yet!"]
+# Just print something so we know it builds
+CMD ["echo", "✅ Dummy Python app build successful!"]
