@@ -1,11 +1,14 @@
 trigger:
-  - main  # or your branch name
+  - main  # or your working branch
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
   imageName: 'frontend-dummy'
+  buildDate: $[format('{0:yyyyMMdd-HHmmss}', pipeline.startTime)]
+  branchName: $[replace(variables['Build.SourceBranchName'], '/', '-')]
+  imageTag: '$(branchName)-$(Build.BuildId)-$(buildDate)'
 
 steps:
 - checkout: self
@@ -13,19 +16,18 @@ steps:
 - task: Docker@2
   displayName: Build Docker image
   inputs:
-    containerRegistry: 'dw-acr-connection'  # ✅ Add this!
+    containerRegistry: 'dw-acr-connection'  # 👉 your ACR service connection name
     command: build
     repository: $(imageName)
     Dockerfile: '**/Dockerfile'
     tags: |
-      $(Build.BuildId)
+      $(imageTag)
 
 - task: Docker@2
   displayName: Push Docker image to ACR
   inputs:
     containerRegistry: 'dw-acr-connection'
-    repository: $(imageName)
     command: push
+    repository: $(imageName)
     tags: |
-      $(Build.BuildId)
-      
+      $(imageTag)
